@@ -1,15 +1,25 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const POSTS = [
   { id: 1, title: "Post 1" },
-  { id: 2, title: "post 2" },
+  { id: 2, title: "Post 2" },
 ];
+
+// /posts-> ["posts"]
+// /posts1 -> ["posts", post.id]
+// /posts?authorId=1 -> ["posts", { author.Id}]
+// /posts/2/comments -> ["posts", post.id, "comments"]
 
 function App() {
   const postsQuery = useQuery({
     queryKey: ["posts"],
-    queryFn: () => wait(1000).then(() => [...POSTS]),
+    queryFn: (obj) =>
+      wait(1000).then(() => {
+        console.log(obj);
+        return [...POSTS];
+      }),
   });
+
   if (postsQuery.isLoading) return <h1>Loading...</h1>;
   if (postsQuery.isError) {
     return <pre>{JSON.stringify(postsQuery.error)}</pre>;
@@ -22,6 +32,7 @@ function App() {
     </div>
   );
 }
+
 function wait(duration) {
   return new Promise((resolve) => setTimeout(resolve, duration));
 }
